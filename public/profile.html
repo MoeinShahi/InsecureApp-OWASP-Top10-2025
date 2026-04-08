@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="css/util.css">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Profile: <span id="profileUser"></span>
+        <a href="/logout" class="btn btn-danger float-right">Logout</a>
+    </h2>
+    <hr>
+    <p>Username: <span id="profileUser2"></span></p>
+    <h4>Your Uploaded Files</h4>
+    <ul id="fileList" class="list-group"></ul>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const user = params.get("user");
+if (!user) window.location.href = "/login.html";
+
+document.getElementById("profileUser").innerText = user;
+document.getElementById("profileUser2").innerText = user;
+
+async function loadFiles() {
+    const res = await fetch(`/files?user=${user}`);
+    const files = await res.json();
+    const list = document.getElementById("fileList");
+    list.innerHTML = "";
+    files.forEach(f => {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.innerHTML = `<a href="/uploads/${user}/${f}" target="_blank">${f}</a>`;
+        list.appendChild(li);
+    });
+}
+loadFiles();
+</script>
+</body>
+</html>

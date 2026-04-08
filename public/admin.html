@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- CSS Template -->
+    <link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
+    <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">  
+    <link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
+    <link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css">
+    <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">  
+    <link rel="stylesheet" type="text/css" href="vendor/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" type="text/css" href="css/util.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <style>
+        .container { max-width: 900px; margin-top: 30px; }
+        .logout { float: right; }
+        .delete-btn { margin-left: 10px; }
+        .wrap-dashboard { padding: 30px; background-color: #fff; border-radius: 10px; }
+        h2 { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+<div class="limiter">
+    <div class="container-login100" style="background-image: url('images/bg-01.jpg');">
+        <div class="wrap-dashboard">
+            <h2>Admin Dashboard 
+                <a href="/logout" class="btn btn-danger logout">Logout</a>
+            </h2>
+            <hr>
+            <h4>Users and Admins</h4>
+            <table class="table table-bordered table-striped" id="userTable">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Uploaded Files</th>
+                        <th>Total Size (KB)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// Get logged in user from query
+const params = new URLSearchParams(window.location.search);
+const currentUser = params.get("user");
+if (!currentUser) window.location.href = "/login.html";
+
+// Load all users
+async function loadUsers() {
+    const res = await fetch("/admin/users", {
+        headers: { "x-user": currentUser, "x-role": "admin" } // header role
+    });
+    const users = await res.json();
+    const tbody = document.querySelector("#userTable tbody");
+    tbody.innerHTML = "";
+    users.forEach(u => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${u.username}</td>
+            <td>${u.role}</td>
+            <td>${u.fileCount}</td>
+            <td>${u.totalSizeKB}</td>
+            <td>
+                <button class="btn btn-danger delete-btn" onclick="deleteUser('${u.username}')">Delete</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+async function deleteUser(username) {
+    if (!confirm(`Delete user ${username}?`)) return;
+    const res = await fetch("/admin/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-user": currentUser, "x-role": "admin" },
+        body: JSON.stringify({ targetUser: username })
+    });
+    const data = await res.json();
+    if (data.success) loadUsers();
+    else alert("Failed to delete user.");
+}
+
+loadUsers();
+</script>
+</body>
+</html>

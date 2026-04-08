@@ -1,18 +1,39 @@
-{
-  "name": "file-converter-app",
+ {
+
+  "name": "fileCloud",
+
   "version": "1.0.0",
+
   "main": "index.js",
+
   "scripts": {
+
     "test": "echo \"Error: no test specified\" && exit 1"
+
   },
+
   "keywords": [],
+
   "author": "",
+
   "license": "ISC",
-  "description": "",
+
   "dependencies": {
+  
+  "internal-logic": "file:internal-logic",
+
     "express": "^5.2.1",
-    "multer": "^1.4.2",
+
+    "express-session": "^1.19.0",
+
+    "multer": "^1.4.4",
+
     "sharp": "^0.34.5",
+
     "string-utils": "file:string-utils"
-  }
-}
+
+  },
+
+  "description": ""
+
+} 
