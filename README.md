@@ -29,6 +29,7 @@ Before running the project, make sure you have installed:
 
 ```bash
 git clone https://github.com/MoeinShahi/InsecureApp-OWASP-Top10-2025.git
+```
 # 🐞 Web Application Security Vulnerability Report (Research Lab)
 
 > ⚠️ Educational / Research Use Only  
@@ -37,13 +38,16 @@ git clone https://github.com/MoeinShahi/InsecureApp-OWASP-Top10-2025.git
 ## 2.Navigate to the project folder
 ```bash
 cd InsecureApp-OWASP-Top10-2025
+```
 
 ## 3. Install dependencies
 ```bash
 npm install
+```
 ## 4.Run the app
 ```bash
 node app.js
+```
 ## 5.Visit the app on browser
 http://localhost:3000/
 
