@@ -1,3 +1,8 @@
+# 🐞 Web Application Security Vulnerability Report (Research Lab)
+
+> ⚠️ Educational / Research Use Only  
+> This document describes security weaknesses in a controlled web application environment for learning and defensive security analysis.
+
 ## ⚡ Quick Access Navigation
 * [🚀 Getting Started](#-getting-started)
 * [🔓 01. Broken Access Control](#1--insecure-direct-object-reference-idor--broken-access-control)
@@ -30,11 +35,6 @@ Before running the project, make sure you have installed:
 ```bash
 git clone https://github.com/MoeinShahi/InsecureApp-OWASP-Top10-2025.git
 ```
-# 🐞 Web Application Security Vulnerability Report (Research Lab)
-
-> ⚠️ Educational / Research Use Only  
-> This document describes security weaknesses in a controlled web application environment for learning and defensive security analysis.
-
 ## 2.Navigate to the project folder
 ```bash
 cd InsecureApp-OWASP-Top10-2025
