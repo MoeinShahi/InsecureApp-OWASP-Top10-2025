@@ -203,7 +203,7 @@ npm update
 ---
 # 5.Mishandling of Exceptional Conditions (OWASP A10:2025)
 
-##🧪 Attack Scenario: Verbose Error Disclosure
+## 🧪 Attack Scenario: Verbose Error Disclosure
 1.The Request: An attacker attempts to access a directory for a user that does not exist via the URL:
 http://localhost:3000/files?user=invalid-user
 
