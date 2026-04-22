@@ -1,6 +1,6 @@
 ## ⚡ Quick Access Navigation
 * [🚀 Getting Started](#-getting-started) — Requirements & Local Setup
-* [🔓 01. Broken Access Control](#1-broken-access-control-idor) — IDOR & URL Manipulation
+* [🔓 1. 🔓 Insecure Direct Object Reference (IDOR) / Broken Access Control](#1-broken-access-control-idor) — IDOR & URL Manipulation
 * [🔐 02. Default Credentials](#2-default-credentials-misconfiguration) — Administrative Access
 * [📁 03. Unrestricted File Upload](#3-unrestricted-file-upload-vulnerability) — XSS & Phishing
 * [⚠️ 04. Supply Chain Failure](#4-software-supply-chain-failure) — Dependency Confusion
