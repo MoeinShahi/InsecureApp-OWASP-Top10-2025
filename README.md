@@ -11,7 +11,6 @@
 * [⚠️ 04. Supply Chain Failure](#4--software-supply-chain-failure-dependency-confusion--malicious-package-risk)
 * [🚨 05. Exception Mishandling](#5--mishandling-of-exceptional-conditions-owasp-a102025)
 * [📌 Summary Table](#-summary-of-security-issues)
-* 
 # 🚀 Getting Started
 
 This guide explains how to set up and run the web application locally.
