@@ -114,7 +114,7 @@ app.get("/files", (req, res) => {
   if (!user) return res.json([]);
 
   const dir = path.join(__dirname, "uploads", user);
-  if (!fs.existsSync(dir)) return res.json([]);
+//  if (!fs.existsSync(dir)) return res.json([]);
 
   res.json(fs.readdirSync(dir));
 });
