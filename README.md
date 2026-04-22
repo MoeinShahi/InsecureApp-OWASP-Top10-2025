@@ -1,10 +1,10 @@
 ## ⚡ Quick Access Navigation
-* [🚀 Getting Started](#-getting-started) — Requirements & Local Setup
-* [🔓 1. 🔓 Insecure Direct Object Reference (IDOR) / Broken Access Control](#1-broken-access-control-idor) — IDOR & URL Manipulation
-* [🔐 02. Default Credentials](#2-default-credentials-misconfiguration) — Administrative Access
-* [📁 03. Unrestricted File Upload](#3-unrestricted-file-upload-vulnerability) — XSS & Phishing
-* [⚠️ 04. Supply Chain Failure](#4-software-supply-chain-failure) — Dependency Confusion
-* [📌 Summary Table](#-summary-of-security-issues) — Severity & Impact Matrix
+* [🚀 Getting Started](#-getting-started)
+* [🔓 01. Broken Access Control](#1--insecure-direct-object-reference-idor--broken-access-control)
+* [🔐 02. Default Credentials](#2--default-credentials-misconfiguration)
+* [📁 03. Unrestricted File Upload](#3--unrestricted-file-upload-vulnerability)
+* [⚠️ 04. Supply Chain Failure](#4--software-supply-chain-failure-dependency-confusion--malicious-package-risk)
+* [📌 Summary Table](#-summary-of-security-issues)
 * 
 # 🚀 Getting Started
 
