@@ -211,9 +211,11 @@ http://localhost:3000/files?user=invalid-user
 
 3.The Mishandling: The application does not "catch" this error. Instead, it crashes the specific request and sends the full System Stack Trace back to the browser.
 🚩 Evidence (Terminal Output)
+```bash
 Error: ENOENT: no such file or directory, scandir '/home/SomeName/fileCloud/uploads/invalid-user'
     at Object.readdirSync (node:fs:1521:26)
     at /home/SomeName/fileCloud/app.js:119:15
+```
 
 # 📌 Summary of Security Issues
 
