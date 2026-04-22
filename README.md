@@ -9,6 +9,7 @@
 * [🔐 02. Default Credentials](#2--default-credentials-misconfiguration)
 * [📁 03. Unrestricted File Upload](#3--unrestricted-file-upload-vulnerability)
 * [⚠️ 04. Supply Chain Failure](#4--software-supply-chain-failure-dependency-confusion--malicious-package-risk)
+* [🚨 05. Exception Mishandling](#5--mishandling-of-exceptional-conditions-owasp-a102025)
 * [📌 Summary Table](#-summary-of-security-issues)
 * 
 # 🚀 Getting Started
@@ -201,6 +202,19 @@ npm update
 - Unsafe automatic updates
 
 ---
+# 5.Mishandling of Exceptional Conditions (OWASP A10:2025)
+
+##🧪 Attack Scenario: Verbose Error Disclosure
+1.The Request: An attacker attempts to access a directory for a user that does not exist via the URL:
+http://localhost:3000/files?user=invalid-user
+
+2.The Condition: The server encounters a node:fs error because the folder is missing.
+
+3.The Mishandling: The application does not "catch" this error. Instead, it crashes the specific request and sends the full System Stack Trace back to the browser.
+🚩 Evidence (Terminal Output)
+Error: ENOENT: no such file or directory, scandir '/home/SomeName/fileCloud/uploads/invalid-user'
+    at Object.readdirSync (node:fs:1521:26)
+    at /home/SomeName/fileCloud/app.js:119:15
 
 # 📌 Summary of Security Issues
 
@@ -210,6 +224,7 @@ npm update
 | Default Credentials | Critical | Immediate admin access |
 | File Upload Vulnerability | High | XSS / RCE / phishing |
 | Supply Chain Failure | Critical | Full system compromise |
+| Mishandling Exceptions | Medium/High | Info Leak / Recon / DoS |
 
 ---
 
