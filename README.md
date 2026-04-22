@@ -8,8 +8,8 @@
 * [🔓 01. Broken Access Control](#1--insecure-direct-object-reference-idor--broken-access-control)
 * [🔐 02. Default Credentials](#2--default-credentials-misconfiguration)
 * [📁 03. Unrestricted File Upload](#3--unrestricted-file-upload-vulnerability)
-* [⚠️ 04. Supply Chain Failure](#4--software-supply-chain-failure-dependency-confusion--malicious-package-risk)
-* [🚨 05. Exception Mishandling](#5--mishandling-of-exceptional-conditions-owasp-a102025)
+* [⚠️ 04. Supply Chain Failure](#4--software-supply-chain-failure)
+* [🚨 05. Exception Mishandling](#5-mishandling-of-exceptional-conditions-owasp-a102025)
 * [📌 Summary Table](#-summary-of-security-issues)
 # 🚀 Getting Started
 
