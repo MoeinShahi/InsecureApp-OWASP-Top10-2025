@@ -1,7 +1,51 @@
+## ⚡ Quick Access Navigation
+* [🚀 Getting Started](#-getting-started) — Requirements & Local Setup
+* [🔓 01. Broken Access Control](#1-broken-access-control-idor) — IDOR & URL Manipulation
+* [🔐 02. Default Credentials](#2-default-credentials-misconfiguration) — Administrative Access
+* [📁 03. Unrestricted File Upload](#3-unrestricted-file-upload-vulnerability) — XSS & Phishing
+* [⚠️ 04. Supply Chain Failure](#4-software-supply-chain-failure) — Dependency Confusion
+* [📌 Summary Table](#-summary-of-security-issues) — Severity & Impact Matrix
+* 
+# 🚀 Getting Started
+
+This guide explains how to set up and run the web application locally.
+
+---
+
+# 📦 Prerequisites
+
+Before running the project, make sure you have installed:
+
+- Node.js (v16 or higher)
+- npm (comes with Node.js)
+- Git
+- A modern web browser (Chrome, Firefox, Edge)
+
+---
+
+# 📥 Installation
+
+## 1. Clone the repository
+
+```bash
+git clone https://github.com/MoeinShahi/InsecureApp-OWASP-Top10-2025.git
 # 🐞 Web Application Security Vulnerability Report (Research Lab)
 
 > ⚠️ Educational / Research Use Only  
 > This document describes security weaknesses in a controlled web application environment for learning and defensive security analysis.
+
+## 2.Navigate to the project folder
+```bash
+cd InsecureApp-OWASP-Top10-2025
+
+## 3. Install dependencies
+```bash
+npm install
+## 4.Run the app
+```bash
+node app.js
+## 5.Visit the app on browser
+http://localhost:3000/
 
 ---
 
