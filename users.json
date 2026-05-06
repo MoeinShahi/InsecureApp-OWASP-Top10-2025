@@ -13,10 +13,5 @@
     "username": "admin",
     "password": "admin",
     "role": "admin"
-  },
-  {
-    "username": "jafar",
-    "password": "jafar",
-    "role": "user"
   }
 ]

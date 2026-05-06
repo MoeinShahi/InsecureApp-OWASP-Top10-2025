@@ -91,6 +91,37 @@ async function deleteUser(username) {
 }
 
 loadUsers();
+
+// --- VULN 10: Stored XSS ---
+// Activity entries are rendered with innerHTML — any stored script payload executes here.
+async function loadActivity() {
+    const res = await fetch("/activity", {
+        headers: { "x-role": "admin" }
+    });
+    const entries = await res.json();
+    const log = document.getElementById("activityLog");
+    log.innerHTML = ""; // reset
+    entries.forEach(e => {
+        const div = document.createElement("div");
+        div.className = "border-bottom py-1";
+        // VULNERABLE: e.action and e.username are raw user input rendered as HTML
+        div.innerHTML = `<small class="text-muted">${e.ts}</small> — <strong>${e.username}</strong>: ${e.action}`;
+        log.appendChild(div);
+    });
+}
+
+loadActivity();
 </script>
+
+<!-- Activity Log Section (Stored XSS surface) -->
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header"><strong>📋 Activity Log</strong> <span class="badge badge-warning">XSS Surface</span></div>
+    <div class="card-body" id="activityLog" style="max-height:200px;overflow-y:auto;">
+      <em>Loading...</em>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

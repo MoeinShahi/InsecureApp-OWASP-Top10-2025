@@ -1,0 +1,96 @@
+
+# 2026-04-28 19:28:34.977069
++y
+
+# 2026-04-28 19:28:47.868383
++n
+
+# 2026-04-28 19:28:55.408248
++hi
+
+# 2026-04-28 19:30:22.995479
++HI
+
+# 2026-04-28 19:33:00.541508
++make a page called example.html in public directoy and publish the word hello in that
+
+# 2026-04-28 19:34:17.192785
++N
+
+# 2026-04-28 19:34:19.786125
++hi
+
+# 2026-04-28 19:34:41.089614
++make a page called example.html in public directoy and publish the word hello in that
+
+# 2026-04-28 19:40:24.883311
++hi
+
+# 2026-04-28 19:43:20.176252
++make a page called example.html in public directory and make it to show hello world
+
+# 2026-04-28 19:43:33.343466
++y
+
+# 2026-04-28 19:43:40.915112
++/run xdg-open public/example.html
+
+# 2026-04-28 19:43:40.915206
++/run xdg-open public/example.html
+
+# 2026-04-28 19:55:34.783372
++y
+
+# 2026-04-28 19:59:22.497754
++This is a file upload cloud and the goal is to make a research about owasp top 10 changes like mainly broken access control and security misconifguration and software supply chain failures and mishandling of execptional conditions , i have already made them in my code and as you can see in readme.md i have documented it as well for every single vulnablity , your task is to make them more realstic and in case of any changes update the readme.md accordingly and add extra vulnablity to it as in the indicated topics like a real world senario 2025 style and you need to document them carefully go ahead
+
+# 2026-04-28 19:59:43.584822
++y
+
+# 2026-04-28 20:01:09.059919
++cd .. > This is a file upload cloud and the goal is to make a research about owasp top 10 changes like mainly broken access c
++> ontrol and security misconifguration and software supply chain failures and mishandling of execptional conditions , i
++>  have already made them in my code and as you can see in readme.md i have documented it as well for every single vuln
++> ablity , your task is to make them more realstic and in case of any changes update the readme.md accordingly and add 
++> extra vulnablity to it as in the indicated topics like a real world senario 2025 style and you need to document them 
++> carefully go ahead 
+
+# 2026-04-28 20:01:37.613140
++> This is a file upload cloud and the goal is to make a research about owasp top 10 changes like mainly broken access c
++> ontrol and security misconifguration and software supply chain failures and mishandling of execptional conditions , i
++>  have already made them in my code and as you can see in readme.md i have documented it as well for every single vuln
++> ablity , your task is to make them more realstic and in case of any changes update the readme.md accordingly and add 
++> extra vulnablity to it as in the indicated topics like a real world senario 2025 style and you need to document them 
++> carefully go ahead 
+
+# 2026-04-28 20:02:16.423606
++y
+
+# 2026-04-28 20:03:44.067942
++A
+
+# 2026-04-28 20:04:31.710660
++continue
+
+# 2026-04-28 20:04:55.674693
++Y
+
+# 2026-04-28 20:11:37.293771
++make an vulnablity when the admin tries to delete a user from the list on the UI it does delete but on the phyiscal storage it does not , so basically there should be a developer bug or mistake involved , this is a app which has vulnablities for research purposes
+
+# 2026-04-28 20:12:07.722923
++Y
+
+# 2026-04-28 20:14:50.137206
++no i mean the whole record from UI must be deleted but when trying to delete from json it should be an error so it should be deleted from admin view but physicallly exist 
+
+# 2026-04-28 20:18:28.306775
++but you are actually deleting the uploads and files of the user , i mean when the admin presses the delete button, from UI it should be deleted but when it tries to delete the physical database json and file it should be handled in wrong way that produce an error and never checks if it was actually deleted or not 
+
+# 2026-04-28 20:24:48.116475
++> make an vulnablity when the admin tries to delete a user from the list on the UI it does delete but on the phyiscal s
++> torage it does not , so basically there should be a developer bug or mistake involved , this is a app which has vulna
++> blities for research purposes , dont delete any file or folder in uploads but only when admin presses the remove button in the table of admin panel the user gets deleted from the table but in background it does not do anything because there must be an error demonstration for vulnablity cases where there is a bug from developer that is poorly handeld the data so the table must remove the row from the table but nothing happens in phyiscall storage in json users and their files in uploads folder remain and also highlight the error in code and log it when its pressed to node server terminal
+
+# 2026-04-28 20:24:58.061977
++Y
