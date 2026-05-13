@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cloud Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="css/util.css">
+<link rel="stylesheet" href="css/main.css">
+
+<style>
+.navbar { margin-bottom: 30px; }
+.container { max-width: 900px; }
+</style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">FileCloud</a>
+
+  <ul class="navbar-nav ml-auto">
+    <li class="nav-item">
+      <a class="nav-link" id="navProfile">Profile</a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link btn btn-danger text-white" href="/logout">
+        Logout
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<div class="container">
+
+<h2>Welcome <span id="userDisplay"></span></h2>
+
+<div class="row">
+
+<div class="col-md-6">
+<h4>Upload File</h4>
+
+<form action="/upload" method="post" enctype="multipart/form-data">
+<input type="hidden" name="username" id="username">
+
+<div class="form-group">
+<input type="file" name="file" class="form-control" required>
+</div>
+
+<button class="btn btn-primary">Upload</button>
+</form>
+</div>
+
+<div class="col-md-6">
+<h4>Recent Uploads</h4>
+<ul id="fileList" class="list-group"></ul>
+</div>
+
+</div>
+</div>
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+const user = params.get("user");
+
+if (!user) window.location.href = "/login.html";
+
+document.getElementById("username").value = user;
+document.getElementById("userDisplay").innerText = user;
+document.getElementById("navProfile").href =
+  `profile.html?user=${user}`;
+
+
+// LOAD FILES
+async function loadFiles() {
+
+  const res = await fetch(`/files?user=${user}`);
+  const files = await res.json();
+
+  const list = document.getElementById("fileList");
+  list.innerHTML = "";
+
+  files.forEach(file => {
+
+    const li = document.createElement("li");
+
+    li.className =
+      "list-group-item d-flex justify-content-between align-items-center";
+
+    li.innerHTML = `
+      <a href="/uploads/${user}/${file}" target="_blank">${file}</a>
+      <button class="btn btn-sm btn-danger">✖</button>
+    `;
+
+    // DELETE BUTTON
+    li.querySelector("button").onclick = async () => {
+
+      if (!confirm("Delete this file?")) return;
+
+      await fetch("/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: user,
+          filename: file
+        })
+      });
+
+      loadFiles();
+    };
+
+    list.appendChild(li);
+  });
+}
+
+loadFiles();
+
+</script>
+
+</body>
+</html>

